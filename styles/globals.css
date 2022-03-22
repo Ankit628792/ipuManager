@@ -1,0 +1,31 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.btn__float {
+    border: 2px solid #fff;
+    transition: all 0.7s ease-in-out;
+    z-index: 300;
+    animation: bounce 1.5s ease-in-out infinite;
+}
+
+@keyframes bounce {
+
+    0%,
+    100% {
+        transform: translateY(-10%);
+        animationTimingFunction: cubic-bezier(0.8, 0, 1, 1);
+    }
+
+    50% {
+        transform: translateY(0);
+        animationTimingFunction: cubic-bezier(0, 0, 0.2, 1);
+    }
+
+}
+
+@layer{
+    .info__text{
+        @apply text-gray-600 font-normal ml-1
+    }
+}
