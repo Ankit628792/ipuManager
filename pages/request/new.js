@@ -11,18 +11,18 @@ export default function () {
     // useEffect(() => toast((t) => <span>Info All fields are </span>), [])
 
     const [data, setData] = useState({
-        enrollNo: '',
-        confirm_enrollNo: '',
-        admissionYear: '',
-        school: '',
-        programme: '',
-        course: '',
-        firstName: '',
-        lastName: '',
-        gender: '',
-        mobileNo: '',
+        enrollNo: 42011302718,
+        confirm_enrollNo: 42011302718,
+        admissionYear: '2018',
+        school: 'USICT',
+        programme: 'MCA',
+        course: 'IT',
+        firstName: 'Yash',
+        lastName: 'Kumar',
+        gender: 'male',
+        mobileNo: 8505931984,
         alternateMobileNo: '',
-        email: '',
+        email: 'ankitbusiness5711@gmail.com',
         alternateEmail: '',
         requestEmail: false,
         emailReason: '',
@@ -44,7 +44,7 @@ export default function () {
         data.append("file", image)
         data.append("upload_preset", "ankit_kumar")
         data.append("cloud_name", "ankit628792")
-        const resp = await fetch(`https://api.cloudinary.com/v1_1/ankit628792/image/upload/ipu`, {
+        const resp = await fetch(`https://api.cloudinary.com/v1_1/ankit628792/image/upload`, {
             method: "post",
             body: data
         })
@@ -57,7 +57,10 @@ export default function () {
         e.preventDefault();
         if (!data.enrollNo || !data.confirm_enrollNo || !data.admissionYear || !data.school || !data.programme || !data.course || !data.firstName || !data.lastName || !data.gender || !data.mobileNo || !data.email || !profileImage || !idImage || !addressProof)
             return toast.error('Fill all the Details')
-        if (enrollNo?.length !== 11) return toast.error('Invalid Enrollment Number')
+        if (!data?.requestEmail && !data?.requestInternet) return toast.error('Submit for atleast on request')
+        if (data?.mobileNo.length !== 10) return toast.error('Invalid Mobile Number')
+        if (data?.alternateMobileNo?.length !== 10) return toast.error('Invalid Alternate Mobile Number')
+        if (data?.enrollNo?.toString().length !== 11) return toast.error('Invalid Enrollment Number')
         if (data.enrollNo !== data.confirm_enrollNo) return toast.error('Enrollment numbers are not same!')
         const check = await fetch('/api/student/', {
             method: 'POST',
@@ -65,7 +68,7 @@ export default function () {
                 'Content-Type': ' application/json',
                 'Request-Type': 'search'
             },
-            body: JSON.stringify({ enrollNo: enrollNo })
+            body: JSON.stringify({ enrollNo: data.enrollNo })
         })
         if (check.status == 200) return toast.error('Email or Enrollment number already exist')
         setIsSending(true)
@@ -151,8 +154,6 @@ export default function () {
                             <input
                                 placeholder="Registered Mobile Number"
                                 required
-                                minLength={10}
-                                maxLength={10}
                                 type="tel"
                                 name="mobileNo"
                                 value={data.mobileNo}
@@ -163,8 +164,6 @@ export default function () {
                         <div className="mb-1 sm:mb-2">
                             <input
                                 placeholder="Alternate Mobile Number"
-                                minLength={10}
-                                maxLength={10}
                                 type="tel"
                                 name="alternateMobileNo"
                                 value={data.alternateMobileNo}
@@ -198,7 +197,7 @@ export default function () {
                         <div className="mb-1 sm:mb-2">
                             <label className="inline-block mb-1 text-gray-800 font-medium">Profile Image</label>
                             <input type="file" required accept="image/*"
-                                onChange={(e) => setProfileImage(e.target.files[0])}
+                                onChange={(e) => e.target.files[0]?.type?.slice(0, 5) === 'image' ? setProfileImage(e.target.files[0]) : toast.error('Only Image format allowed!')}
                                 className="flex-grow w-full py-2 px-4 mb-2 transition duration-200 bg-white border border-gray-300 rounded shadow-sm appearance-none focus:outline-none focus:shadow-outline"
                             />
                             {(profileImage?.size > 200000) && <p className="text-red-500 text-sm">Maximum image upload size is 2MB </p>}
@@ -207,7 +206,7 @@ export default function () {
                         <div className="mb-1 sm:mb-2">
                             <label className="inline-block mb-1 text-gray-800 font-medium">Student ID Card Image</label>
                             <input type="file" required accept="image/*"
-                                onChange={(e) => setIdImage(e.target.files[0])}
+                                onChange={(e) => e.target.files[0]?.type?.slice(0, 5) === 'image' ? setIdImage(e.target.files[0]) : toast.error('Only Image format allowed!')}
                                 className="flex-grow w-full py-2 px-4 mb-2 transition duration-200 bg-white border border-gray-300 rounded shadow-sm appearance-none focus:outline-none focus:shadow-outline"
                             />
                             {(idImage?.size > 300000) && <p className="text-red-500 text-sm">Maximum image upload size is 3MB </p>}
@@ -215,7 +214,7 @@ export default function () {
 
                         <div className="mb-1 sm:mb-2">
                             <label className="inline-block mb-1 text-gray-800 font-medium">Adress Proof</label>
-                            <input type="file" required
+                            <input type="file" required accept="image/*"
                                 onChange={(e) => setAddressProof(e.target.files[0])}
                                 className="flex-grow w-full py-2 px-4 mb-2 transition duration-200 bg-white border border-gray-300 rounded shadow-sm appearance-none focus:outline-none focus:shadow-outline"
                             />
@@ -305,12 +304,12 @@ export default function () {
                         </fieldset>
                         <fieldset className='border p-5 my-4'>
                             <legend className='text-xl font-medium'>Request for</legend>
-                            <input type='checkbox' name='requestEmail' value={!data.requestEmail} onChange={handleChange} required className='accent-purple-600 mr-1 w-4 h-4 cursor-pointer' /><span>Provide Email Id</span> <br />
-                            {data.requestEmail && <textarea name="emailReason" value={data.emailReason} onChange={handleChange} required className='p-2 m-4 h-40'>
-                            </textarea>}
-                            <input type='checkbox' name='requestInternet' value="true" onChange={handleChange} required className='accent-purple-600 mr-1 w-4 h-4 cursor-pointer' /><span>Provide Internet Access</span> <br />
-                            {data.requestInternet && <textarea name="internetReason" value={data.internetReason} onChange={handleChange} required className='p-2 m-4 h-40'>
-                            </textarea>}
+                            <input type='checkbox' name='requestEmail' value={!data.requestEmail} onChange={handleChange} className='accent-purple-600 mr-1 w-4 h-4 cursor-pointer' /><span>Provide Email Id</span> <br />
+                            <textarea name="emailReason" value={data.emailReason} onChange={handleChange} required={data.requestEmail} placeholder="Describe why you need mail id ..." minLength={10} className='p-2 m-4 h-20 w-full border resize-none'>
+                            </textarea>
+                            <input type='checkbox' name='requestInternet' value="true" onChange={handleChange} className='accent-purple-600 mr-1 w-4 h-4 cursor-pointer' /><span>Provide Internet Access</span> <br />
+                            <textarea name="internetReason" value={data.internetReason} required={data.requestInternet} placeholder="Describe why you need internet id" minLength={10} onChange={handleChange} className='p-2 m-4 h-20 w-full border resize-none'>
+                            </textarea>
                         </fieldset>
                     </div>
 

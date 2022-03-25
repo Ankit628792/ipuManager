@@ -1,4 +1,4 @@
-import { createStudent, deleteStudent, findAllStudent, findStudent, updateStudent } from "../service/student.service"
+import { createStudent, deleteStudent, exportStudent, findAllStudent, findStudent, updateStudent } from "../service/student.service"
 import sendEMail from "../util/sendEMail";
 
 export async function createStudentHandler(req, res) {
@@ -75,11 +75,6 @@ export async function updateStudentHandler(req, res) {
                 const data = { subject: `Confirmation of IPU Email Access`, email: student?.email, html: `<p>Your Request of getting IPU Email Access is completed. </p> <p>Here is your credentials</p> <p>Mail id: ${student?.ipuEmail} <br /> Password: ${student?.ipuPassword}</p> <p>Follow the university rules and do not share my Password / Credential to anyone</p>` };
                 const result = await sendEMail(data);
                 console.log(result);
-                // const data = { subject: `Confirmation of IPU Email Access`, text: link, email: userRegistered.email, html: `Click <a href="${link}" target="_blank">Here</a>  to verify your account.` };
-                // if (!isVerified) {
-                //     const result = await sendEMail(data);
-                //     console.log(result);
-                // }
             }
             if (internetId) {
                 const data = { subject: `Confirmation of IPU Internet Access`, email: student?.email, html: `<p>Your Request of getting IPU Internet Access is completed. </p> <p>Here is your credentials</p> <p>Internet id: ${student?.ipuEmail} <br /> Password: ${student?.ipuPassword}</p> <p>Follow the university rules and do not share my Password / Credential to anyone</p>` };
@@ -110,4 +105,21 @@ export async function removeStudentHandler(req, res) {
         console.error(error)
         return { status: 400, msg: "Couldn't make a request" }
     }
+}
+
+export async function exportStudentHandler(req, res) {
+    const { initialDate, finalDate } = req.body;
+    try {
+        const query = {
+            updatedAt: { $gte: new Date(initialDate), $lte: new Date(finalDate) },
+            isVerified: true
+        }
+        const data = await exportStudent(query);
+        if (!data) { return { status: 400, msg: "Can't get student data" } }
+        return { status: 200, data: data }
+    } catch (error) {
+        console.error(error)
+        return { status: 400, msg: "Couldn't make a request" }
+    }
+
 }

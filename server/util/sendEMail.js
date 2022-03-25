@@ -7,13 +7,12 @@ const sendEMail = async (data) => {
             secure: true,
             port: 465,
             auth: {
-                user: process.env.MAIL_USER,
-                pass: process.env.MAIL_PASS,
+                user: 'ggsipu@zohomail.in',
+                pass: 'joebiden', //pass UWCHGfx8sRFN
             },
         })
-
         const mailData = {
-            from: process.env.mail_user,
+            from: process.env.MAIL_USER,
             to: `${data.email}`,
             subject: `${data.subject}`,
             text: `${data.text}`,

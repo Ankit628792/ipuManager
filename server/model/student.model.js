@@ -62,17 +62,13 @@ const studentSchema = new mongoose.Schema({
         default: false
     },
     ipuEmail: {
-        type: String,
-        unique: true,
-        default: null
+        type: String
     },
     ipuPassword: {
         type: String
     },
     internetId: {
-        type: String,
-        unique: true,
-        default: null
+        type: String
     },
     internetPassword: {
         type: String

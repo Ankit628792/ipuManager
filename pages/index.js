@@ -7,7 +7,7 @@ const Home = () => {
 
   const onSearch = async (e) => {
     e.preventDefault();
-    if (enrollNo?.length !== 11) return toast.error('Invalid Enrollment Number')
+    if (enrollNo?.toString().length !== 11) return toast.error('Invalid Enrollment Number')
 
     else {
       const res = await fetch('/api/student/', {
@@ -33,7 +33,6 @@ const Home = () => {
         <h1 className='text-purple-600 text-3xl xl:text-4xl font-bold text-center mt-10'>Check Your Request</h1>
 
         <form onSubmit={onSearch} className="my-6 relative max-w-lg mx-auto">
-          {/* <label htmlFor="email" className="inline-block mb-1 text-gray-800 font-medium text-lg">Email<span className="mx-1 text-red-500">*</span></label> */}
           <input
             placeholder="Enter Enrollment number"
             required

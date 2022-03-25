@@ -35,8 +35,15 @@ export async function updateStudent(_id, input) {
 
 export async function deleteStudent(_id) {
     try {
-        const data = await Student.findByIdAndDelete({ _id: _id })
-        return data
+        return await Student.findByIdAndDelete({ _id: _id })
+    } catch (error) {
+        throw new Error(error)
+    }
+}
+
+export async function exportStudent(query) {
+    try {
+        return await Student.find(query)
     } catch (error) {
         throw new Error(error)
     }
