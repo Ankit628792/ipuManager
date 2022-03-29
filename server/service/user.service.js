@@ -10,7 +10,7 @@ export async function findUser(query) {
 
 export async function findAllUser(query) {
     try {
-        return User.find(query, { _id: 1, name: 1, email: 1, type: 1 })
+        return User.find(query, { _id: 1, name: 1, email: 1, type: 1, school: 1 })
     } catch (error) {
         throw new Error(error)
     }
@@ -30,9 +30,9 @@ export async function validatePassword(credentials) {
 }
 
 export async function createUser(input) {
-    const { name, email, password, owner, type } = input
+    const { name, email, password, owner, type, school } = input
     try {
-        const user = new User({ name, email, password, owner, type });
+        const user = new User({ name, email, password, owner, type, school });
         return await user.save()
     } catch (error) {
         throw new Error(error)

@@ -26,8 +26,8 @@ export async function getUserHandler(req, res) {
 
 
 export async function createUserHandler(req, res) {
-    const { name, email, password, owner } = req.body;
-    if (!name || !email || !password) return { status: 406, msg: 'Fill all the details!' };
+    const { name, email, password, school, owner } = req.body;
+    if (!name || !email || !password || !school) return { status: 406, msg: 'Fill all the details!' };
     if (!owner) return { status: 406, msg: 'Super User Unauthorised!' };
     try {
         if (!(await findUser({ email }))) {

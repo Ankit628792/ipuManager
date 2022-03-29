@@ -1,3 +1,4 @@
+import { getSession } from "next-auth/react";
 import Header from "./Header";
 import ScrollToTop from "./ScrollToTop";
 
@@ -9,7 +10,15 @@ export default function Layout({ children }) {
                 {children}
             </main>
             <ScrollToTop />
-            {/* <Footer /> */}
         </>
     )
+}
+
+export async function getServerSideProps(context) {
+    const session = await getSession(context);
+    return {
+        props: {
+            session
+        }
+    }
 }

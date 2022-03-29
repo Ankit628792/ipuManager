@@ -82,6 +82,12 @@ const studentSchema = new mongoose.Schema({
     addressProof: {
         type: String
     },
+    closed: {
+        type: Boolean
+    },
+    closedReason: {
+        type: String
+    },
 }, { timestamps: true })
 
 // studentSchema.pre('findOneAndUpdate', async function (next) {

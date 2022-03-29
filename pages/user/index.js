@@ -1,8 +1,11 @@
 import { getSession, useSession } from 'next-auth/react'
 import { useState, useEffect } from 'react'
 import toast, { Toaster } from 'react-hot-toast'
+import { programmeList } from '../../util'
+
 
 const NewUser = ({ setIsNew, owner, isEdit, preData }) => {
+    const schools = [... new Set(programmeList.map(item => item.school))]
     const { data: session } = useSession()
     const [data, setData] = useState({
         _id: preData?._id || '',
@@ -10,6 +13,7 @@ const NewUser = ({ setIsNew, owner, isEdit, preData }) => {
         email: preData?.email || '',
         type: session?.user?.type === 'owner' ? 'dean' : 'admin',
         password: '',
+        school: session?.user?.type === 'dean' ? session?.user?.school : '',
         owner: owner
     })
     const [isSending, setIsSending] = useState(false)
@@ -20,7 +24,6 @@ const NewUser = ({ setIsNew, owner, isEdit, preData }) => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         setIsSending(true)
-        console.log(data)
         const res = await fetch('/api/user/', {
             method: isEdit ? 'PATCH' : 'POST',
             headers: {
@@ -46,7 +49,7 @@ const NewUser = ({ setIsNew, owner, isEdit, preData }) => {
     return (
 
         <div className='fixed top-0 left-0 w-full h-full min-h-screen bg-gray-50 bg-opacity-20 backdrop-filter backdrop-blur grid place-items-center z-10'>
-            <form onSubmit={handleSubmit} className='max-w-xl rounded-xl shadow-lg border border-gray-100 p-5 sm:p-10 bg-white'>
+            <form onSubmit={handleSubmit} className='max-w-xl w-full rounded-xl shadow-lg border border-gray-100 p-5 sm:p-10 bg-white'>
                 <h1 className='text-purple-600 text-3xl xl:text-4xl font-bold text-center mb-8'>{isEdit ? 'Update User' : 'Create New User'}</h1>
                 <div className="mb-2">
                     <label htmlFor="name" className="inline-block mb-1 text-gray-800 font-medium text-lg">Name<span className="mx-1 text-red-500">*</span></label>
@@ -84,6 +87,19 @@ const NewUser = ({ setIsNew, owner, isEdit, preData }) => {
                         className="flex-grow w-full h-12 px-4 mb-2 transition duration-200 border border-gray-300 rounded shadow-sm appearance-none focus:outline-none focus:shadow-outline"
                     />
                 </div>
+                {session?.user?.type === 'owner' && <div className="mb-1 sm:mb-2">
+                    <label htmlFor="password" className="inline-block mb-1 text-gray-800 font-medium text-lg">School<span className="mx-1 text-red-500">*</span></label>
+                    <select
+                        required
+                        name="school"
+                        value={data.school}
+                        onChange={handleChange}
+                        className="flex-grow w-full h-12 px-4 mb-2 transition duration-200 bg-white border border-gray-300 rounded shadow-sm appearance-none focus:outline-none focus:shadow-outline"
+                    >
+                        <option value='' disabled>Select school</option>
+                        {schools.map(school => <option key={school} value={school} className='capitalize'>{school}</option>)}
+                    </select>
+                </div>}
                 <div className="my-4 flex items-center gap-x-5">
                     <button type="submit" className="px-5 py-2 text-lg font-medium text-white hover:bg-purple-800 border bg-purple-600 rounded-3xl transition-all duration-150 ease-out cursor-pointer"
                         disabled={isSending}
@@ -134,7 +150,6 @@ const User = ({ user }) => {
     const { data: session } = useSession()
     const [isEdit, setIsEdit] = useState(false)
     const [isDelete, setIsDelete] = useState(false)
-
     return (
         <>
             <div className='relative max-w-xs rounded-xl border border-purple-100 shadow-lg shadow-purple-50 p-5 pt-8 text-lg font-semibold text-gray-600'>
@@ -146,7 +161,8 @@ const User = ({ user }) => {
                 </svg>
                 <h1>Name: <span className='text-purple-600 font-medium ml-1'>{user?.name}</span></h1>
                 <h1 className='my-2'>Email: <span className='text-purple-600 font-medium ml-1'>{user?.email}</span></h1>
-                <h1>type: <span className='text-purple-600 font-medium ml-1 capitalize'>{user?.type}</span> </h1>
+                <h1>Type: <span className='text-purple-600 font-medium ml-1 capitalize'>{user?.type}</span> </h1>
+                {user?.school && <h1 className='mt-2'>School: <span className='text-purple-600 font-medium ml-1 capitalize'>{user?.school}</span> </h1>}
             </div>
             {isEdit && <NewUser owner={session?.user?._id} isEdit={true} setIsNew={setIsEdit} preData={user} />}
             {isDelete && <DelModel setIsDelete={setIsDelete} _id={user?._id} />}

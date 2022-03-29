@@ -1,6 +1,6 @@
 import React from 'react'
 import Router from 'next/router'
-import { signOut, useSession } from 'next-auth/react'
+import { getSession, signOut, useSession } from 'next-auth/react'
 
 function Header() {
     const { data: session } = useSession()
@@ -30,3 +30,12 @@ function Header() {
 }
 
 export default Header
+
+export async function getServerSideProps(context) {
+    const session = await getSession(context);
+    return {
+        props: {
+            session
+        }
+    }
+}

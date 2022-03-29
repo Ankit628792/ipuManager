@@ -17,6 +17,9 @@ const userSchema = new mongoose.Schema({
         type: String,
         default: 'admin'
     },
+    school: {
+        type: String
+    },
     owner: {
         type: mongoose.Schema.Types.ObjectId,
         required: true

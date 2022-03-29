@@ -1,5 +1,5 @@
-import { createStudent, deleteStudent, exportStudent, findAllStudent, findStudent, updateStudent } from "../service/student.service"
-import sendEMail from "../util/sendEMail";
+import { closeStudent, createStudent, deleteStudent, exportStudent, findAllStudent, findStudent, updateStudent, verifyStudent } from "../service/student.service"
+import sendEMail from '../../util/sendEMail';
 
 export async function createStudentHandler(req, res) {
     const { email, enrollNo } = req.body;
@@ -8,11 +8,11 @@ export async function createStudentHandler(req, res) {
             const newStudent = await createStudent(req.body)
             if (newStudent) {
                 const link = `${process.env.HOST}`
-                const data = { subject: `Confirmation for your Credentials Request`, text: link, email: newStudent?.email, html: `<p>Your Request of getting {IPU Internet} is submmited. </p> <p>Click <a href="${link}" target="_blank">Here</a> to check the status for your request</p> ` };
+                const data = { subject: `Confirmation for your Credentials Request`, text: link, email: newStudent?.email, html: `<p>Your Request of getting ${newStudent?.requestEmail ? 'Email Access' : ''}, ${newStudent?.requestInternet ? 'Internet Access' : ''} is submmited. </p> <p>Click <a href="${link}" target="_blank">Here</a> to check the status for your request</p> ` };
                 const result = await sendEMail(data);
                 console.log(result);
+                return { status: 201, msg: 'Request Submitted Successfully!' };
             }
-            return { status: 201, msg: 'Request Submitted Successfully!' };
         } else {
             return { status: 403, msg: 'Student has already requested for email id' }
         }
@@ -39,8 +39,9 @@ export async function searchStudentHandler(req, res) {
 }
 
 export async function getAllStudentHandler(req, res) {
-    const { verified } = req.query
-    const query = { isVerified: verified == 'undefined' ? true : verified, ipuEmail: undefined, ipuPassword: undefined }
+    const { verified, school, closed } = req.query
+    // const query = { isVerified: verified == 'undefined' ? true : verified, school: school, ipuEmail: undefined, ipuPassword: undefined }
+    const query = { isVerified: verified || true, school: school || '', ipuEmail: undefined, ipuPassword: undefined, closed: closed ? true : false }
     try {
         const student = await findAllStudent(query);
         if (!student) { return { status: 400, msg: "Can't get student data" } }
@@ -87,6 +88,33 @@ export async function updateStudentHandler(req, res) {
         }
     } catch (error) {
         console.error(error)
+        return { status: 400, msg: "Couldn't make a request" }
+    }
+}
+
+export async function verifyStudentHandler(req, res) {
+    const { owner, collection } = req.body;
+    if (!owner) return { status: 401, msg: "You don't have authorization!" };
+    try {
+        const filter = { _id: { $in: collection } }
+        const query = { isVerified: true }
+        await verifyStudent(filter, query)
+        return { status: 200, msg: 'Student Verified Successfully!' };
+    } catch (error) {
+        console.log(error)
+        return { status: 400, msg: "Couldn't make a request" }
+    }
+}
+export async function closeStudentHandler(req, res) {
+    const { owner, _id } = req.body;
+    if (!owner) return { status: 401, msg: "You don't have authorization!" };
+    try {
+        const filter = { _id: _id }
+        const query = req.body
+        await closeStudent(filter, query)
+        return { status: 200, msg: 'Student Closed Successfully!' };
+    } catch (error) {
+        console.log(error)
         return { status: 400, msg: "Couldn't make a request" }
     }
 }

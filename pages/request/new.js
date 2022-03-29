@@ -1,14 +1,15 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import toast, { Toaster } from 'react-hot-toast';
-import { useEffect } from 'react';
+import { programmeList } from '../../util';
 
-const years = ['2022', '2021', '2020', '2019', '2018', '2017']
-const schools = ['USAP', 'USBAS', 'USBT', 'USCT', 'USE', 'USEM', 'USHSS', 'USICT', 'USLLS', 'USMC', 'USMS', 'USAR', 'USDI', 'CDMS']
-const programmes = ['B.Arch.', 'B.Tech.', 'M.Tech.', 'M.A.', 'MCA', 'MBA', 'M.Ed.', 'M.Sc.', 'PG Diploma', 'LLB', 'LLM', 'Ph.D.']
-const courses = ['BCE', 'Biodiversity', 'BT', 'CE', 'CSE', 'ECE', 'Economics', 'Education', 'EM', 'English', 'EP', 'FA', 'IT', 'MC', 'NST', 'NRM', 'SE', 'MCDD', 'Other']
+const year = new Date().getFullYear()
+
+const years = [`${year}`, `${year - 1}`, `${year - 2}`, `${year - 3}`, `${year - 4}`, `${year - 5}`]
+// const schools = ['USAP', 'USBAS', 'USBT', 'USCT', 'USE', 'USEM', 'USHSS', 'USICT', 'USLLS', 'USMC', 'USMS', 'USAR', 'USDI', 'CDMS']
+// const programmes = ['B.Arch.', 'B.Tech.', 'M.Tech.', 'M.A.', 'MCA', 'MBA', 'M.Ed.', 'M.Sc.', 'PG Diploma', 'LLB', 'LLM', 'Ph.D.']
+// const courses = ['BCE', 'Biodiversity', 'BT', 'CE', 'CSE', 'ECE', 'Economics', 'Education', 'EM', 'English', 'EP', 'FA', 'IT', 'MC', 'NST', 'NRM', 'SE', 'MCDD', 'Other']
 
 export default function () {
-    // useEffect(() => toast((t) => <span>Info All fields are </span>), [])
 
     const [data, setData] = useState({
         enrollNo: 42011302718,
@@ -29,6 +30,28 @@ export default function () {
         requestInternet: false,
         internetReason: ''
     })
+    // const schools = [... new Set(programmeList.map(item => item.school))]
+    // const programmes = [... new Set(programmeList.map(item => { if (item.school === data.school) return item.name }))]
+    // console.log(programmes.shift())
+    // const courses = [... new Set(programmeList.map(item => { if (item.name === data.programme && item.course) return item.course }))]
+    // console.log(courses.shift())
+
+    const [schools, setSchools] = useState([... new Set(programmeList.map(item => item.school))])
+    const [programmes, setProgrammes] = useState()
+    const [courses, setCourses] = useState()
+
+    useEffect(() => {
+        const program = [... new Set(programmeList.map(item => { if (item.school === data.school) return item.name }))]
+        program?.length > 0 && program.shift()
+        setProgrammes(program)
+    }, [data.school, schools])
+
+    useEffect(() => {
+        const course = [... new Set(programmeList.map(item => { if (item.name === data.programme && item.course) return item.course }))]
+        course?.length > 0 && course.shift()
+        setCourses(course)
+    }, [data.programme], programmes)
+
     const [profileImage, setProfileImage] = useState();
     const [idImage, setIdImage] = useState();
     const [addressProof, setAddressProof] = useState();
@@ -57,9 +80,10 @@ export default function () {
         e.preventDefault();
         if (!data.enrollNo || !data.confirm_enrollNo || !data.admissionYear || !data.school || !data.programme || !data.course || !data.firstName || !data.lastName || !data.gender || !data.mobileNo || !data.email || !profileImage || !idImage || !addressProof)
             return toast.error('Fill all the Details')
-        if (!data?.requestEmail && !data?.requestInternet) return toast.error('Submit for atleast on request')
-        if (data?.mobileNo.length !== 10) return toast.error('Invalid Mobile Number')
-        if (data?.alternateMobileNo?.length !== 10) return toast.error('Invalid Alternate Mobile Number')
+        if (data?.requestEmail == 'false' && data?.requestInternet == 'false') return toast.error('Submit for atleast on request')
+        if (data?.requestEmail == "true" && !data?.emailReason) return toast.error('Submit Reason for email request')
+        if (data?.requestInternet == "true" && !data?.internetReason) return toast.error('Submit Reason for internet request')
+        if (data?.mobileNo.toString().length !== 10) return toast.error('Invalid Mobile Number')
         if (data?.enrollNo?.toString().length !== 11) return toast.error('Invalid Enrollment Number')
         if (data.enrollNo !== data.confirm_enrollNo) return toast.error('Enrollment numbers are not same!')
         const check = await fetch('/api/student/', {
@@ -68,7 +92,7 @@ export default function () {
                 'Content-Type': ' application/json',
                 'Request-Type': 'search'
             },
-            body: JSON.stringify({ enrollNo: data.enrollNo })
+            body: JSON.stringify({ enrollNo: data.enrollNo.toString() })
         })
         if (check.status == 200) return toast.error('Email or Enrollment number already exist')
         setIsSending(true)
@@ -78,9 +102,9 @@ export default function () {
         const res = await fetch('/api/student/', {
             method: 'POST',
             headers: {
-                'Content-Type': ' application/json',
+                'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ ...data, profileImage: profileImage_url, idImage: idImage_url, addressProof: addressProof_url })
+            body: JSON.stringify({ ...data, enrollNo: data.enrollNo.toString(), profileImage: profileImage_url, idImage: idImage_url, addressProof: addressProof_url })
         })
         const response = await res.json()
         if (res.status === 201) {
@@ -107,6 +131,7 @@ export default function () {
             setProfileImage('')
             setIdImage('')
             setAddressProof('')
+            window.location.reload()
         }
         else
             toast.error(response.msg)
@@ -165,6 +190,7 @@ export default function () {
                             <input
                                 placeholder="Alternate Mobile Number"
                                 type="tel"
+                                maxLength={10}
                                 name="alternateMobileNo"
                                 value={data.alternateMobileNo}
                                 onChange={handleChange}
@@ -274,7 +300,7 @@ export default function () {
                                     className="flex-grow w-full h-12 px-4 mb-2 transition duration-200 bg-white border border-gray-300 rounded shadow-sm appearance-none focus:outline-none focus:shadow-outline"
                                 >
                                     <option value='' disabled>Select School</option>
-                                    {schools.map(school => <option key={school} value={school} className='capitalize'>{school}</option>)}
+                                    {schools?.map(school => <option key={school} value={school} className='capitalize'>{school}</option>)}
                                 </select>
                             </div>
                             <div className="mb-1 sm:mb-2">
@@ -286,7 +312,8 @@ export default function () {
                                     className="flex-grow w-full h-12 px-4 mb-2 transition duration-200 bg-white border border-gray-300 rounded shadow-sm appearance-none focus:outline-none focus:shadow-outline"
                                 >
                                     <option value='' disabled>Select Programme</option>
-                                    {programmes.map(programme => <option key={programme} value={programme} className='capitalize'>{programme}</option>)}
+                                    {programmes?.map(programme => <option key={programme} value={programme} className='capitalize'>{programme}</option>)}
+                                    <option value='other'>Other</option>
                                 </select>
                             </div>
                             <div className="mb-1 sm:mb-2">
@@ -298,17 +325,18 @@ export default function () {
                                     className="flex-grow w-full h-12 px-4 mb-2 transition duration-200 bg-white border border-gray-300 rounded shadow-sm appearance-none focus:outline-none focus:shadow-outline"
                                 >
                                     <option value='' disabled>Select Course</option>
-                                    {courses.map(course => <option key={course} value={course} className='capitalize'>{course}</option>)}
+                                    {courses?.map(course => <option key={course} value={course} className='capitalize'>{course}</option>)}
+                                    <option value='other'>Other</option>
                                 </select>
                             </div>
                         </fieldset>
                         <fieldset className='border p-5 my-4'>
                             <legend className='text-xl font-medium'>Request for</legend>
                             <input type='checkbox' name='requestEmail' value={!data.requestEmail} onChange={handleChange} className='accent-purple-600 mr-1 w-4 h-4 cursor-pointer' /><span>Provide Email Id</span> <br />
-                            <textarea name="emailReason" value={data.emailReason} onChange={handleChange} required={data.requestEmail} placeholder="Describe why you need mail id ..." minLength={10} className='p-2 m-4 h-20 w-full border resize-none'>
+                            <textarea name="emailReason" value={data.emailReason} onChange={handleChange} placeholder="Describe why you need mail id ..." minLength={10} className='p-2 m-4 h-20 w-full border resize-none'>
                             </textarea>
                             <input type='checkbox' name='requestInternet' value="true" onChange={handleChange} className='accent-purple-600 mr-1 w-4 h-4 cursor-pointer' /><span>Provide Internet Access</span> <br />
-                            <textarea name="internetReason" value={data.internetReason} required={data.requestInternet} placeholder="Describe why you need internet id" minLength={10} onChange={handleChange} className='p-2 m-4 h-20 w-full border resize-none'>
+                            <textarea name="internetReason" value={data.internetReason} placeholder="Describe why you need internet id" minLength={10} onChange={handleChange} className='p-2 m-4 h-20 w-full border resize-none'>
                             </textarea>
                         </fieldset>
                     </div>
