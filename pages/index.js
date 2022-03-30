@@ -16,7 +16,7 @@ const Home = () => {
           'Content-Type': ' application/json',
           'Request-Type': 'search'
         },
-        body: JSON.stringify({ enrollNo: enrollNo })
+        body: JSON.stringify({ enrollNo: enrollNo.toString() })
       })
       const response = await res.json()
       if (res.status === 200)

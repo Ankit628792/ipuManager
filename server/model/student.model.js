@@ -26,7 +26,7 @@ const studentSchema = new mongoose.Schema({
         type: Number
     },
     enrollNo: {
-        type: Number,
+        type: String,
         required: true
     },
     admissionYear: {
@@ -86,6 +86,12 @@ const studentSchema = new mongoose.Schema({
         type: Boolean
     },
     closedReason: {
+        type: String
+    },
+    rejected: {
+        type: Boolean
+    },
+    rejecteddReason: {
         type: String
     },
 }, { timestamps: true })

@@ -41,7 +41,14 @@ export async function searchStudentHandler(req, res) {
 export async function getAllStudentHandler(req, res) {
     const { verified, school, closed } = req.query
     // const query = { isVerified: verified == 'undefined' ? true : verified, school: school, ipuEmail: undefined, ipuPassword: undefined }
-    const query = { isVerified: verified || true, school: school || '', ipuEmail: undefined, ipuPassword: undefined, closed: closed ? true : false }
+    // const query = { isVerified: verified || true, school: school || '', ipuEmail: undefined, ipuPassword: undefined, closed: closed ? true : false }
+    let query = {};
+    if (closed === 'closed') {
+        query = { ipuEmail: undefined, ipuPassword: undefined, internetId: undefined, internetPassword: undefined, closed: true }
+    }
+    else {
+        query = { ipuEmail: undefined, ipuPassword: undefined, internetId: undefined, internetPassword: undefined, isVerified: verified == 'undefined' ? true : verified }
+    }
     try {
         const student = await findAllStudent(query);
         if (!student) { return { status: 400, msg: "Can't get student data" } }
@@ -149,5 +156,4 @@ export async function exportStudentHandler(req, res) {
         console.error(error)
         return { status: 400, msg: "Couldn't make a request" }
     }
-
 }

@@ -16,7 +16,7 @@ export default function index({ data }) {
     const [initialDate, setInitialDate] = useState();
     const [finalDate, setFinalDate] = useState();
 
-    const [isSending, setIsSending] = useState(false)
+    const [loading, setLoading] = useState(false)
     const [isVerify, setIsVerify] = useState(false)
     const [filter, setFilter] = useState({ verified: session?.user?.type !== 'dean' })
 
@@ -31,15 +31,13 @@ export default function index({ data }) {
         { label: "Alternate Mobile no", key: "alternateMobileNo" },
         { label: "Enrollment no", key: "enrollNo" },
         { label: "Admission Year", key: "admissionYear" },
-        { label: "Schhol", key: "school" },
+        { label: "School", key: "school" },
         { label: "Programme", key: "programme" },
         { label: "Course", key: "course" },
-        { label: "Programme", key: "programme" },
         { label: "Verified", key: "isVerified" },
         { label: "Profile Image", key: "profileImage" },
         { label: "Id Proof", key: "idImage" },
         { label: "Address Proof", key: "addressProof" },
-        { label: "Verified", key: "isVerified" },
         { label: "Requested for Email Id", key: "requestEmail" },
         { label: "Reason for Email Id", key: "emailReason" },
         { label: "IPU Email Id", key: "ipuEmail" },
@@ -48,10 +46,13 @@ export default function index({ data }) {
         { label: "Reason for Internet Id", key: "internetReason" },
         { label: "IPU Internet Id", key: "internetId" },
         { label: "IPU Internet Password", key: "internetPassword" },
+        { label: "Student Rejected", key: "rejected" },
+        { label: "Rejected Reason", key: "rejectedReason" },
         { label: "Student Removed", key: "closed" },
         { label: "Removed Reason", key: "closedReason" },
-
     ];
+
+    useEffect(() => { if (!session) return Router.push('/user/login') }, [session])
 
 
     const getStudentData = async () => {
@@ -94,7 +95,7 @@ export default function index({ data }) {
 
     const updateStudent = async (e) => {
         e?.preventDefault();
-        setIsSending(true)
+        setLoading(true)
         const res = await fetch('/api/student/verify', {
             method: 'PATCH',
             headers: {
@@ -110,7 +111,7 @@ export default function index({ data }) {
         }
         else
             toast.error(response.msg)
-        setIsSending(false)
+        setLoading(false)
     }
 
     useEffect(() => {
@@ -119,22 +120,22 @@ export default function index({ data }) {
 
     return (
         <>
-            {collection?.length > 0 && session?.user?.type == 'dean' && <div className="absolute z-50 grid place-items-center bottom-0 left-0 right-0 p-4 backdrop-filter backdrop-blur-md bg-purple-100 bg-opacity-40">
+            {collection?.length > 0 && <div className="absolute z-50 grid place-items-center bottom-0 left-0 right-0 p-4 backdrop-filter backdrop-blur-md bg-purple-100 bg-opacity-40">
                 <button
                     onClick={() => setIsVerify(true)}
                     className="px-5 py-2 text-lg font-medium text-white hover:bg-purple-800 border bg-purple-600 rounded-3xl transition-all duration-150 ease-out cursor-pointer"
-                >Verify Selected</button>
+                >Accept Selected</button>
             </div>
             }
             {
                 isVerify && <div className='fixed top-0 left-0 w-full h-full min-h-screen bg-gray-50 bg-opacity-20 backdrop-filter backdrop-blur grid place-items-center z-10'>
                     <div className='max-w-xl rounded-xl shadow-lg border border-gray-100 p-5 sm:p-10 bg-white flex flex-col justify-center items-center'>
-                        <h1 className='text-purple-800 text-2xl xl:text-3xl font-medium text-center mb-8'>Please confirm to Verify Selected Student</h1>
+                        <h1 className='text-purple-800 text-2xl xl:text-3xl font-medium text-center mb-8'>Please confirm to Accept Selected Student</h1>
                         <div className='flex items-center justify-around gap-x-5'>
                             <button className="px-5 py-2 text-lg font-medium text-white hover:bg-purple-800 border bg-purple-600 rounded-3xl transition-all duration-150 ease-out cursor-pointer"
-                                onClick={() => updateStudent()} disabled={isSending}>{isSending ? 'Wait...' : 'Set Verified'}</button>
+                                onClick={() => updateStudent()} disabled={loading}>{loading ? 'Wait...' : 'Set Verified'}</button>
                             <button className="px-5 py-2 text-lg font-medium text-white hover:bg-purple-800 border bg-purple-600 rounded-3xl transition-all duration-150 ease-out cursor-pointer"
-                                onClick={() => setIsVerify(false)} disabled={isSending}>Cancel</button>
+                                onClick={() => setIsVerify(false)} disabled={loading}>Cancel</button>
                         </div>
                     </div>
                 </div>

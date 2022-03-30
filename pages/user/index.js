@@ -1,4 +1,5 @@
 import { getSession, useSession } from 'next-auth/react'
+import Router from 'next/router'
 import { useState, useEffect } from 'react'
 import toast, { Toaster } from 'react-hot-toast'
 import { programmeList } from '../../util'
@@ -17,6 +18,7 @@ const NewUser = ({ setIsNew, owner, isEdit, preData }) => {
         owner: owner
     })
     const [isSending, setIsSending] = useState(false)
+
     const handleChange = (e) => {
         e.preventDefault();
         setData({ ...data, [e.target.name]: e.target.value })
@@ -187,6 +189,9 @@ function index({ users }) {
                 .then(data => setUserList(data))
         }
     }, [session, isNew])
+
+    useEffect(() => { if (!session) return Router.push('/user/login') }, [session])
+
 
     return (
         <>
