@@ -66,7 +66,7 @@ const ProvideEmail = ({ setIsEmail, _id }) => {
                 <div className="my-4 flex items-center gap-x-5">
                     <button type="submit" className="px-5 py-2 text-lg font-medium text-white hover:bg-purple-800 border bg-purple-600 rounded-3xl transition-all duration-150 ease-out cursor-pointer"
                         disabled={isSending}
-                        onClick={updateStudent}>{isSending ? 'Wait...' : 'Send Credentials'}</button>
+                        onSubmit={updateStudent}>{isSending ? 'Wait...' : 'Send Credentials'}</button>
 
                     <button className="px-5 py-2 text-lg font-medium text-white hover:bg-purple-800 border bg-purple-600 rounded-3xl transition-all duration-150 ease-out cursor-pointer"
                         onClick={() => setIsEmail(false)}>Cancel</button>
@@ -139,7 +139,7 @@ const ProvideInternet = ({ setIsInternet, _id }) => {
                 <div className="my-4 flex items-center gap-x-5">
                     <button type="submit" className="px-5 py-2 text-lg font-medium text-white hover:bg-purple-800 border bg-purple-600 rounded-3xl transition-all duration-150 ease-out cursor-pointer"
                         disabled={isSending}
-                        onClick={updateStudent}>{isSending ? 'Wait...' : 'Send Credentials'}</button>
+                        onSubmit={updateStudent}>{isSending ? 'Wait...' : 'Send Credentials'}</button>
 
                     <button className="px-5 py-2 text-lg font-medium text-white hover:bg-purple-800 border bg-purple-600 rounded-3xl transition-all duration-150 ease-out cursor-pointer"
                         onClick={() => setIsInternet(false)}>Cancel</button>

@@ -4,7 +4,6 @@ import { CSVLink } from "react-csv";
 import { useState, useEffect } from "react";
 import toast, { Toaster } from "react-hot-toast";
 
-let temp = [];
 
 export default function index({ data }) {
     const [collection, setCollection] = useState([])
@@ -26,7 +25,7 @@ export default function index({ data }) {
         { label: "Last Name", key: "lastName" },
         { label: "Gender", key: "gender" },
         { label: "Registered Email", key: "email" },
-        { label: "Alternate Email", key: "email" },
+        { label: "Alternate Email", key: "alternateEmail" },
         { label: "Registered Mobile no", key: "mobileNo" },
         { label: "Alternate Mobile no", key: "alternateMobileNo" },
         { label: "Enrollment no", key: "enrollNo" },
@@ -115,7 +114,7 @@ export default function index({ data }) {
     }
 
     useEffect(() => {
-        fetch(`http://localhost:3000/api/student/?verified=${filter.verified}&school=${session?.user?.school}&closed=${filter.verified}`).then((res) => res.json()).then(data => setStudents(data.data))
+        fetch(`/api/student/?verified=${filter.verified}&school=${session?.user?.school}&closed=${filter.verified}`).then((res) => res.json()).then(data => setStudents(data.data))
     }, [filter])
 
     return (
