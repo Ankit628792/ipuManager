@@ -28,4 +28,7 @@
     .info__text{
         @apply text-gray-600 font-normal ml-1
     }
+    .apply__form p{
+        @apply text-sm text-red-400 max-w-sm
+    }
 }

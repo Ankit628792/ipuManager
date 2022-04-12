@@ -1,4 +1,4 @@
-import { signIn, useSession, signOut, getSession } from 'next-auth/react'
+import { signIn, signOut, getSession } from 'next-auth/react'
 import { useState } from 'react';
 import toast, { Toaster } from 'react-hot-toast';
 import Router from 'next/router';

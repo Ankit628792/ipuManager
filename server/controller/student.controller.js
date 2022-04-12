@@ -9,8 +9,8 @@ export async function createStudentHandler(req, res) {
             if (newStudent) {
                 const link = `${process.env.HOST}`
                 const data = { subject: `Confirmation for your Credentials Request`, text: link, email: newStudent?.email, html: `<p>Your Request of getting ${newStudent?.requestEmail ? 'Email Access' : ''}, ${newStudent?.requestInternet ? 'Internet Access' : ''} is submmited. </p> <p>Click <a href="${link}" target="_blank">Here</a> to check the status for your request</p> ` };
-                const result = await sendEMail(data);
-                console.log(result);
+                // const result = await sendEMail(data);
+                // console.log(result);
                 return { status: 201, msg: 'Request Submitted Successfully!' };
             }
         } else {
@@ -24,8 +24,8 @@ export async function createStudentHandler(req, res) {
 
 export async function searchStudentHandler(req, res) {
     const { enrollNo, email } = req.body
-    const query = email ? { enrollNo: enrollNo, email: email } : { enrollNo: enrollNo }
     if (!enrollNo) return { status: 404, msg: "Student not found!" }
+    const query = email ? { enrollNo: enrollNo, email: email } : { enrollNo: enrollNo }
     try {
         const student = await findStudent(query);
         if (!student) { return { status: 400, msg: "Can't get student data" } }
