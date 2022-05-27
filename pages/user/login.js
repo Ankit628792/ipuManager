@@ -5,8 +5,8 @@ import Router from 'next/router';
 
 
 function login() {
-    const [email, setEmail] = useState('ak@gmail.com');
-    const [password, setPassword] = useState('123456')
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('')
     const [isSending, setIsSending] = useState(false)
 
     const submitData = async () => {
