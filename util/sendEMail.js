@@ -7,8 +7,8 @@ const sendEMail = async (data) => {
             secure: true,
             port: 465,
             auth: {
-                user: 'ggsipu@zohomail.in',
-                pass: 'joebiden', //pass UWCHGfx8sRFN
+                user: process.env.MAIL_USER,
+                pass: process.env.MAIL_PASS,
             },
         })
         const mailData = {
